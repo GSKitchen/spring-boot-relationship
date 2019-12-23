@@ -1,14 +1,24 @@
 package com.example.relation.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "posts")
@@ -31,6 +41,21 @@ public class Post extends AuditModel{
 	@NotNull
 	@Lob
 	private String content;
+	
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	@ManyToMany(
+			fetch = FetchType.LAZY,
+			cascade = {
+					CascadeType.PERSIST,
+					CascadeType.MERGE
+			}
+			)
+	@JoinTable(
+			name = "post_tag",
+			joinColumns = { @JoinColumn(name="post_id")},
+			inverseJoinColumns = {@JoinColumn(name="tag_id")}
+			)
+	private Set<Tag> tags = new HashSet<>();
 
 	
 	public Post() {
@@ -38,13 +63,21 @@ public class Post extends AuditModel{
 	}
 
 
-	public Post(@NotNull @Size(max = 100) String title, @NotNull String slug, String description,
-			@NotNull String content) {
+	public Post(String title, String slug, String description, String content) {
 		super();
 		this.title = title;
 		this.slug = slug;
 		this.description = description;
 		this.content = content;
+	}
+	
+	public Post(String title, String slug, String description, String content, Set<Tag> tags) {
+		super();
+		this.title = title;
+		this.slug = slug;
+		this.description = description;
+		this.content = content;
+		this.tags = tags;
 	}
 
 
@@ -95,6 +128,16 @@ public class Post extends AuditModel{
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+
+	public Set<Tag> getTags() {
+		return tags;
+	}
+
+
+	public void setTags(Set<Tag> tags) {
+		this.tags = tags;
 	}
 	
 }
