@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,9 @@ import com.example.relation.model.Post;
 import com.example.relation.model.Tag;
 import com.example.relation.repository.PostRepository;
 import com.example.relation.repository.TagRepository;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 @RestController
 public class PostController {
@@ -36,9 +40,33 @@ public class PostController {
 	@Autowired
 	private TagRepository tagRepository;
 
+	/*
 	@GetMapping(value = "/posts")
 	public Page<Post> getAllPost(Pageable pageable) {
 		return postRepository.findAll(pageable);
+	} */
+	
+	@GetMapping(value = "/posts")
+	public MappingJacksonValue getAllPost() {
+		List<Post> posts = postRepository.findAll();
+		MappingJacksonValue mapping = new MappingJacksonValue(posts);
+		
+		/*
+		 * Example from stack
+		 * FilterProvider filters = new SimpleFilterProvider()
+            .addFilter("myFilter", SimpleBeanPropertyFilter
+                    .filterOutAllExcept(new HashSet<String>(Arrays
+                            .asList(new String[] { "name", "firstName" }))));
+		 * 
+		 */
+		
+		SimpleBeanPropertyFilter filterTag = SimpleBeanPropertyFilter.serializeAllExcept("posts");
+		SimpleBeanPropertyFilter filterPost = SimpleBeanPropertyFilter.serializeAll();
+		FilterProvider filterProvider = new SimpleFilterProvider()
+											.addFilter("tagFilter", filterTag)
+											.addFilter("postFilter", filterPost);
+		mapping.setFilters(filterProvider);
+		return mapping;
 	}
 
 	@GetMapping("/posts/{postId}")

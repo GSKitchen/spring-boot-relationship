@@ -16,10 +16,12 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.NaturalId;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "tags")
+@JsonFilter("tagFilter")
 public class Tag extends AuditModel{
 
 	@Id
@@ -31,7 +33,7 @@ public class Tag extends AuditModel{
 	@NaturalId
 	private String name;
 	
-	@JsonIgnore
+	//@JsonIgnore
 	@ManyToMany(
 			fetch = FetchType.LAZY,
 			cascade = {
