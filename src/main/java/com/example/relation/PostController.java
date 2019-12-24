@@ -1,5 +1,6 @@
 package com.example.relation;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.relation.dto.PostDto;
 import com.example.relation.exception.ResourceNotFoundException;
@@ -63,8 +65,8 @@ public class PostController {
 		SimpleBeanPropertyFilter filterTag = SimpleBeanPropertyFilter.serializeAllExcept("posts");
 		SimpleBeanPropertyFilter filterPost = SimpleBeanPropertyFilter.serializeAll();
 		FilterProvider filterProvider = new SimpleFilterProvider()
-											.addFilter("tagFilter", filterTag)
-											.addFilter("postFilter", filterPost);
+				.addFilter("tagFilter", filterTag)
+				.addFilter("postFilter", filterPost);
 		mapping.setFilters(filterProvider);
 		return mapping;
 	}
@@ -76,7 +78,7 @@ public class PostController {
 	}
 
 	@PostMapping("/posts")
-	public Post createPost(@Valid @RequestBody PostDto pd) {
+	public ResponseEntity<Object> createPost(@Valid @RequestBody PostDto pd) {
 		Post post = pd.getPost();
 		System.out.println("===============================================");
 		System.out.println(pd.getTagsId());
@@ -97,7 +99,9 @@ public class PostController {
 		
 		tagRepository.saveAll(tagList); */
 		
-		return postRepository.save(post);
+		Post savedPost = postRepository.save(post);
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedPost.getId()).toUri();
+		return ResponseEntity.created(location).build();
 	}
 
 	
