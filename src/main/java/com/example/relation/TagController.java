@@ -1,6 +1,7 @@
 package com.example.relation;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.Valid;
 
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.relation.dto.PostByTagDto;
+import com.example.relation.dto.response.PostByTagDto;
 import com.example.relation.model.Post;
 import com.example.relation.model.Tag;
 import com.example.relation.repository.TagRepository;
@@ -37,6 +38,24 @@ public class TagController {
 	public MappingJacksonValue getAllTag(){
 		List<Tag> tags = tagRepository.findAll();
 		MappingJacksonValue mapping = new MappingJacksonValue(tags);
+		SimpleBeanPropertyFilter filterPost = SimpleBeanPropertyFilter.serializeAllExcept("tags");
+		SimpleBeanPropertyFilter filterTag = SimpleBeanPropertyFilter.serializeAllExcept("posts");
+		FilterProvider filterProvider = new SimpleFilterProvider()
+											.addFilter("postFilter", filterPost)
+											.addFilter("tagFilter", filterTag);
+		mapping.setFilters(filterProvider);
+		return mapping;
+	}
+	
+	
+	@GetMapping("/tags/{tagId}")
+	public MappingJacksonValue getPostByTag(@PathVariable Long tagId){
+		Tag tag = tagRepository.findById(tagId).get();
+		Set<Post> posts = tag.getPosts();
+		PostByTagDto respDto = new PostByTagDto();
+		respDto.setTag(tag);
+		respDto.setPosts(posts);
+		MappingJacksonValue mapping = new MappingJacksonValue(respDto);
 		SimpleBeanPropertyFilter filterPost = SimpleBeanPropertyFilter.serializeAllExcept("tags");
 		SimpleBeanPropertyFilter filterTag = SimpleBeanPropertyFilter.serializeAll();
 		FilterProvider filterProvider = new SimpleFilterProvider()

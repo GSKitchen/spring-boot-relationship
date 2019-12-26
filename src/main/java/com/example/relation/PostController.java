@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.example.relation.dto.PostDto;
+import com.example.relation.dto.request.PostDto;
 import com.example.relation.exception.ResourceNotFoundException;
 import com.example.relation.model.Post;
 import com.example.relation.model.Tag;

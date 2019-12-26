@@ -1,4 +1,4 @@
-package com.example.relation.dto;
+package com.example.relation.dto.request;
 
 import java.util.HashSet;
 import java.util.Set;
