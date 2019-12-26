@@ -5,3 +5,19 @@ INNER JOIN posts
 ON post_tag.post_id = posts.id
 WHERE tags.id = 2
 ORDER BY posts.id ASC
+
+
+
+------------------
+
+FileInputStream serviceAccount =
+  new FileInputStream("path/to/serviceAccountKey.json");
+
+FirebaseOptions options = new FirebaseOptions.Builder()
+  .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+  .setDatabaseUrl("https://spring-boot-auth-c6842.firebaseio.com")
+  .build();
+
+FirebaseApp.initializeApp(options);
+
+----------------------

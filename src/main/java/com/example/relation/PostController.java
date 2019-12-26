@@ -22,8 +22,10 @@ import com.example.relation.dto.request.PostDto;
 import com.example.relation.exception.ResourceNotFoundException;
 import com.example.relation.model.Post;
 import com.example.relation.model.Tag;
+import com.example.relation.model.User;
 import com.example.relation.repository.PostRepository;
 import com.example.relation.repository.TagRepository;
+import com.example.relation.repository.UserRepository;
 
 @RestController
 public class PostController {
@@ -33,6 +35,9 @@ public class PostController {
 
 	@Autowired
 	private TagRepository tagRepository;
+	
+	@Autowired
+	private UserRepository userRepository;  
 
 	@GetMapping(value = "/posts")
 	public Page<Post> getAllPost() {
@@ -47,10 +52,13 @@ public class PostController {
 
 	@PostMapping("/posts")
 	public ResponseEntity<Object> createPost(@Valid @RequestBody PostDto pd) {
+		User user = userRepository.getOne(pd.getUserId());
 		Post post = pd.getPost();
 		System.out.println("===============================================");
 		System.out.println(pd.getTagsId());
 		System.out.println("===============================================");
+		
+		post.setUser(user);
 		
 		for(Long tagId: pd.getTagsId()) {
 			Tag tag = tagRepository.getOne(tagId);
