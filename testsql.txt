@@ -1,0 +1,7 @@
+SELECT posts.id, posts.title, posts.content, tags.id, tags.name, posts.created_at FROM `tags`
+INNER JOIN post_tag
+ON tags.id = post_tag.tag_id
+INNER JOIN posts
+ON post_tag.post_id = posts.id
+WHERE tags.id = 2
+ORDER BY posts.id ASC
