@@ -3,5 +3,5 @@ package com.example.relation.service;
 import com.example.relation.config.firebase.FirebaseTokenHolder;
 
 public interface FirebaseService {
-	FirebaseTokenHolder parseToken(String idToken);
+	FirebaseTokenHolder parseToken(String idToken) throws Exception;
 }

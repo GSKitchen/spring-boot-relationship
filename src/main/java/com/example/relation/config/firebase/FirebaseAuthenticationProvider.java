@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -31,7 +32,6 @@ public class FirebaseAuthenticationProvider implements AuthenticationProvider{
 		}
 		
 		authenticationToken = new FirebaseAuthenticationToken(details.getAuthorities(), details, authentication.getCredentials());
-		
 		return authenticationToken;
 	}
 }

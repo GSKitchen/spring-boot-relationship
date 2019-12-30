@@ -7,11 +7,16 @@ import com.google.firebase.auth.FirebaseToken;
 
 public class FirebaseTokenHolder {
 	private FirebaseToken token;
+	private String uid;
 
 	public FirebaseTokenHolder(FirebaseToken token) {
 		this.token = token;
 	}
 	
+	public FirebaseTokenHolder(String uid) {
+		this.uid = uid;
+	}
+
 	public String getEmail() {
 		return token.getEmail();
 	}

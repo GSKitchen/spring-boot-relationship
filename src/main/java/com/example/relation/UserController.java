@@ -25,12 +25,12 @@ public class UserController {
 	@Autowired
 	private UserRepository userRepository;
 
-	@PostMapping("/user")
+	@PostMapping("/users")
 	public User createUser(@Valid @RequestBody User user) {
 		return userRepository.save(user);
 	}
 	
-	@GetMapping("/user")
+	@GetMapping("/users")
 	public List<User> getUserList(){
 		return userRepository.findAll();
 	}
