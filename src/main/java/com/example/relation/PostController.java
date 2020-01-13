@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -28,6 +29,7 @@ import com.example.relation.model.User;
 import com.example.relation.repository.PostRepository;
 import com.example.relation.repository.TagRepository;
 import com.example.relation.repository.UserRepository;
+import com.example.relation.service.PostService;
 
 @RestController
 public class PostController {
@@ -40,16 +42,21 @@ public class PostController {
 	
 	@Autowired
 	private UserRepository userRepository;  
+	
+	@Autowired
+	private PostService postService;
 
 	@GetMapping(value = "/posts", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Page<Post> getAllPost() {
-		Pageable pageable = PageRequest.of(1, 10);
-		return postRepository.findAll(pageable);
+	public Page<Post> getAllPost(
+			@RequestParam(value = "pageNo", defaultValue = "0", required = false) Integer pageNo,
+			@RequestParam(value = "limit", defaultValue = "5", required = false) Integer limit) {
+		Pageable pageable = PageRequest.of(pageNo, limit);
+		return postService.getAllPost(pageable);
 	}
 
 	@GetMapping("/posts/{postId}")
 	public Post getPost(@PathVariable Long postId) {
-		return postRepository.findById(postId).get();
+		return postService.findById(postId);
 	}
 
 	@PostMapping("/posts")
@@ -76,7 +83,7 @@ public class PostController {
 		}).collect(Collectors.toList());
 		
 		tagRepository.saveAll(tagList); */
-		
+		post.setSlug(ExtraTools.toSlug(post.getTitle()));
 		Post savedPost = postRepository.save(post);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedPost.getId()).toUri();
 		return ResponseEntity.created(location).build();

@@ -5,8 +5,6 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.relation.model.User;
-import com.example.relation.repository.UserRepository;
+import com.example.relation.service.UserService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -24,16 +22,21 @@ import com.google.firebase.auth.UserRecord;
 public class UserController {
 	
 	@Autowired
-	private UserRepository userRepository;
+	private UserService userService;
 
 	@PostMapping("/users")
 	public User createUser(@Valid @RequestBody User user) {
-		return userRepository.save(user);
+		return userService.createUser(user);
 	}
 	
 	@GetMapping("/users")
 	public List<User> getUserList(){
-		return userRepository.findAll();
+		return userService.getAllUser();
+	}
+	
+	@GetMapping("/users/{userId}")
+	public User getUserById(@PathVariable Long userId) {
+		return userService.findById(userId);
 	}
 	
 	@GetMapping("/firebase-user/{uid}")

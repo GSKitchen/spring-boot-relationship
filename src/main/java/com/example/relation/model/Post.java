@@ -72,13 +72,20 @@ public class Post extends AuditModel{
 		super();
 	}
 
-
 	public Post(String title, String slug, String description, String content) {
 		super();
 		this.title = title;
 		this.slug = slug;
 		this.description = description;
 		this.content = content;
+	}
+	
+	public Post(String title, String description, String content, Set<Tag> tags) {
+		super();
+		this.title = title;
+		this.description = description;
+		this.content = content;
+		this.tags = tags;
 	}
 	
 	public Post(String title, String slug, String description, String content, Set<Tag> tags) {
