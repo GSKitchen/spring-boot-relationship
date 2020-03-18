@@ -1,18 +1,18 @@
 package com.example.relation.service.impl;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.relation.dto.response.PostResponse;
+import com.example.relation.dto.response.TagResponse;
 import com.example.relation.exception.ResourceNotFoundException;
 import com.example.relation.model.Post;
 import com.example.relation.model.Tag;
@@ -26,32 +26,20 @@ public class PostServiceImpl implements PostService {
 	private PostRepository postRepository;
 	
 	@Autowired
-	private RedisTemplate<String, Post> redisTemplate;
+	private RedisTemplate<String, PostResponse> redisTemplate;
 	
 	@Autowired
 	private RedisTemplate<String, Tag> redisTagTemplate;
 	
 	@Override
-	public Post findById(Long postId) {
+	@Transactional
+	public PostResponse findById(Long postId) {
 		final String key = "post_" + postId;
-		ValueOperations<String, Post> operations = redisTemplate.opsForValue();
-		ValueOperations<String, Tag> tagOperations = redisTagTemplate.opsForValue();
+		ValueOperations<String, PostResponse> operations = redisTemplate.opsForValue();
 		final boolean hasKey = redisTemplate.hasKey(key);
 		
 		if(hasKey) {
-			System.out.println("haskey found");
-			System.out.println(operations.get(key).toString());
-			Post post = operations.get(key);
-			System.out.println("cache post found");
-			//post.setTags(null);
-			//set tag from cache
-			/*
-			List<Long> tagsId = post.getTags().stream()
-				.map(tag->tag.getId())
-				.collect(Collectors.toList());
-			Set<Tag> cachedTag = tagsId.stream().map(id-> {
-				cachedTag.add(tagOperations.get("tag_" + id));
-			}).collect(Collectors.toSet()); */
+			PostResponse post = operations.get(key);
 			
 			System.out.println("from cache --- " + key);
 			return post;
@@ -59,14 +47,23 @@ public class PostServiceImpl implements PostService {
 		Optional<Post> postOptional = postRepository.findById(postId);
 		if(postOptional.isPresent()) {
 			Post post = postOptional.get();
-			Set<Tag> tags = post.getTags();
-			operations.set(key, post);
-			tags.forEach(tag ->{
-				tagOperations.set("tag_" + tag.getId(), tag);
-				System.out.println("tag" + tag.getId() + "inseted into cache");
-			});
+			PostResponse postResponse = new PostResponse();
+			postResponse.setId(post.getId());
+			postResponse.setContent(post.getContent());
+			postResponse.setDescription(post.getDescription());
+			postResponse.setSlug(post.getSlug());
+			postResponse.setTags(post.getTags().stream().map(tag -> {
+				TagResponse dto = new TagResponse();
+				dto.setId(tag.getId());
+				dto.setName(tag.getName());
+				return dto;
+			}).collect(Collectors.toSet()));
+			postResponse.setTitle(post.getTitle());
+			postResponse.setUser(null);
+			
+			operations.set(key, postResponse);
 			System.out.println("insert to cache " + key);
-			return post;
+			return postResponse;
 		}else {
 			throw new ResourceNotFoundException("Post Not found: " + postId);
 		}

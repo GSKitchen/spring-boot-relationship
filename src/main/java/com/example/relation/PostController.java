@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.relation.dto.request.PostDto;
+import com.example.relation.dto.response.PostResponse;
 import com.example.relation.exception.ResourceNotFoundException;
 import com.example.relation.model.Post;
 import com.example.relation.model.Tag;
@@ -55,7 +56,7 @@ public class PostController {
 	}
 
 	@GetMapping("/posts/{postId}")
-	public Post getPost(@PathVariable Long postId) {
+	public PostResponse getPost(@PathVariable Long postId) {
 		return postService.findById(postId);
 	}
 
